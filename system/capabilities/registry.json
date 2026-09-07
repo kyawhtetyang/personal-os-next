@@ -10,6 +10,26 @@
       "runtime": "runtime.capabilities.media_save",
       "cli": "python -m runtime media save",
       "description": "Save supported media from a URL as audio or video."
+    },
+    {
+      "id": "vault.read",
+      "status": "active",
+      "version": "0.1.0",
+      "definition": "system/capabilities/vault.read.md",
+      "contract": "system/contracts/vault.read.contract.json",
+      "runtime": "runtime.capabilities.vault_access",
+      "cli": "python -m runtime execute vault.read",
+      "description": "Read one Markdown file from the canonical vault."
+    },
+    {
+      "id": "vault.write",
+      "status": "active",
+      "version": "0.1.0",
+      "definition": "system/capabilities/vault.write.md",
+      "contract": "system/contracts/vault.write.contract.json",
+      "runtime": "runtime.capabilities.vault_access",
+      "cli": "python -m runtime execute vault.write",
+      "description": "Write one verified Markdown file to the canonical vault."
     }
   ]
 }
