@@ -3,11 +3,11 @@ from __future__ import annotations
 import argparse
 import json
 
-from runtime.capabilities.media_save import save_media
 from runtime.context import ContextAssembler, ContextRequest
 from runtime.context.projections import project_json, project_markdown
 from runtime.core.registry import get_capability, list_capabilities
 from runtime.core.discovery import discover
+from runtime.execution import ExecutionEngine, ExecutionRequest
 from runtime.health import check
 
 def build_parser():
@@ -54,7 +54,11 @@ def main():
     elif args.domain == "health" and args.command == "check":
         result = check()
     elif args.domain == "media" and args.command == "save":
-        result = save_media(url=args.url, mode=args.mode, audio_format=args.audio_format, video_format=args.video_format, output_dir=args.output_dir, overwrite=args.overwrite, browser=args.browser, cookies=args.cookies)
+        request = ExecutionRequest("media.save", {"url": args.url}, {
+            "mode": args.mode, "audio_format": args.audio_format, "video_format": args.video_format,
+            "output_dir": args.output_dir, "overwrite": args.overwrite, "browser": args.browser, "cookies": args.cookies,
+        })
+        result = ExecutionEngine().execute(request)
     elif args.domain == "context" and args.command == "show":
         context = ContextAssembler().assemble(ContextRequest(args.purpose, query=args.query, sources=args.sources))
         if args.format == "markdown":
