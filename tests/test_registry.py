@@ -10,7 +10,8 @@ class RegistryTests(unittest.TestCase):
     def test_loads_canonical_registry(self):
         registry = load_capabilities()
         self.assertEqual(registry["schema_version"], "0.1")
-        self.assertEqual(len(registry["capabilities"]), 1)
+        capability_ids = {capability["id"] for capability in registry["capabilities"]}
+        self.assertEqual(capability_ids, {"media.save", "vault.read", "vault.write"})
 
     def test_lists_media_save(self):
         capabilities = list_capabilities()
