@@ -4,6 +4,8 @@ import shutil
 from pathlib import Path
 from runtime.core.run_record import write_run
 from runtime.core.result import failure, success
+from runtime.core.artifact import register_artifact
+from runtime.core.state import update_state
 
 def _fail(kind, message, hint, source_url):
     error={"kind":kind,"message":message,"hint":hint}
@@ -38,4 +40,29 @@ def save_media(url, mode="audio", audio_format="mp3", video_format="mp4", output
         return _fail("VerificationError","Command completed but no expected artifact was found.","Inspect yt-dlp output and output directory.",url)
     artifact=created[-1]
     run=write_run("media.save","success",source_url=url,artifact_path=str(artifact))
-    return success("media.save", run_id=run["run_id"], artifacts=[str(artifact)], data={"source_url":url,"format":artifact.suffix.lstrip("."),"run":run})
+    artifact_record=register_artifact(
+        artifact,
+        "media",
+        run_id=run["run_id"],
+        source=url,
+    )
+    state=update_state(
+        "media.save",
+        {
+            "status":"success",
+            "last_run_id":run["run_id"],
+            "last_artifact_id":artifact_record["artifact_id"],
+            "last_artifact_path":str(artifact),
+        },
+    )
+    return success(
+        "media.save",
+        run_id=run["run_id"],
+        artifacts=[artifact_record],
+        data={
+            "source_url":url,
+            "format":artifact.suffix.lstrip("."),
+            "run":run,
+            "state":state,
+        },
+    )
