@@ -5,20 +5,39 @@ import json
 
 from runtime.context import ContextAssembler, ContextRequest
 from runtime.context.projections import project_json, project_markdown
-from runtime.core.registry import get_capability, list_capabilities
 from runtime.core.discovery import discover
+from runtime.core.registry import get_capability, list_capabilities
 from runtime.execution import ExecutionEngine, ExecutionRequest
 from runtime.health import check
+
+
+def _json_object(value, label):
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError as exc:
+        raise argparse.ArgumentTypeError(f"{label} must be valid JSON: {exc.msg}") from exc
+    if not isinstance(parsed, dict):
+        raise argparse.ArgumentTypeError(f"{label} must be a JSON object.")
+    return parsed
+
 
 def build_parser():
     parser = argparse.ArgumentParser(prog="python -m runtime")
     domains = parser.add_subparsers(dest="domain", required=True)
+
     domains.add_parser("discover")
+
     capabilities = domains.add_parser("capabilities")
     capability_commands = capabilities.add_subparsers(dest="command", required=True)
     capability_commands.add_parser("list")
     show = capability_commands.add_parser("show")
     show.add_argument("capability_id")
+
+    execute = domains.add_parser("execute")
+    execute.add_argument("capability")
+    execute.add_argument("--input", required=True, type=lambda value: _json_object(value, "--input"))
+    execute.add_argument("--options", default={}, type=lambda value: _json_object(value, "--options"))
+
     media = domains.add_parser("media")
     commands = media.add_subparsers(dest="command", required=True)
     save = commands.add_parser("save")
@@ -30,6 +49,7 @@ def build_parser():
     save.add_argument("--overwrite", action="store_true")
     save.add_argument("--browser")
     save.add_argument("--cookies")
+
     context = domains.add_parser("context")
     context_commands = context.add_subparsers(dest="command", required=True)
     context_show = context_commands.add_parser("show")
@@ -37,30 +57,54 @@ def build_parser():
     context_show.add_argument("--query")
     context_show.add_argument("--source", action="append", dest="sources")
     context_show.add_argument("--format", choices=["json", "markdown"], default="markdown")
+
     health = domains.add_parser("health")
     health.add_subparsers(dest="command", required=True).add_parser("check")
     return parser
 
+
 def main():
     parser = build_parser()
     args = parser.parse_args()
+
     if args.domain == "discover":
         result = discover()
     elif args.domain == "capabilities" and args.command == "list":
         result = {"status": "success", "capabilities": list_capabilities()}
     elif args.domain == "capabilities" and args.command == "show":
         capability = get_capability(args.capability_id)
-        result = {"status": "success", "capability": capability} if capability else {"status": "failed", "error": {"kind": "NotFoundError", "message": f"Unknown capability: {args.capability_id}"}}
+        result = (
+            {"status": "success", "capability": capability}
+            if capability
+            else {
+                "status": "failed",
+                "error": {
+                    "kind": "NotFoundError",
+                    "message": f"Unknown capability: {args.capability_id}",
+                },
+            }
+        )
+    elif args.domain == "execute":
+        result = ExecutionEngine().execute(
+            ExecutionRequest(args.capability, args.input, args.options)
+        )
     elif args.domain == "health" and args.command == "check":
         result = check()
     elif args.domain == "media" and args.command == "save":
         request = ExecutionRequest("media.save", {"url": args.url}, {
-            "mode": args.mode, "audio_format": args.audio_format, "video_format": args.video_format,
-            "output_dir": args.output_dir, "overwrite": args.overwrite, "browser": args.browser, "cookies": args.cookies,
+            "mode": args.mode,
+            "audio_format": args.audio_format,
+            "video_format": args.video_format,
+            "output_dir": args.output_dir,
+            "overwrite": args.overwrite,
+            "browser": args.browser,
+            "cookies": args.cookies,
         })
         result = ExecutionEngine().execute(request)
     elif args.domain == "context" and args.command == "show":
-        context = ContextAssembler().assemble(ContextRequest(args.purpose, query=args.query, sources=args.sources))
+        context = ContextAssembler().assemble(
+            ContextRequest(args.purpose, query=args.query, sources=args.sources)
+        )
         if args.format == "markdown":
             print(project_markdown(context))
             raise SystemExit(0)
@@ -68,8 +112,10 @@ def main():
     else:
         parser.error("Unsupported command")
         return
+
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result["status"] in {"success", "healthy"} else 1)
+
 
 if __name__ == "__main__":
     main()
