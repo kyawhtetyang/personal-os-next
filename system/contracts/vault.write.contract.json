@@ -1,0 +1,6 @@
+{
+  "schema_version": "0.1",
+  "capability": "vault.write",
+  "input": {"type": "object", "required": ["path", "content"], "properties": {"path": {"type": "string"}, "content": {"type": "string"}, "overwrite": {"type": "boolean"}}},
+  "output": {"type": "object", "required": ["path", "bytes_written", "format"]}
+}
