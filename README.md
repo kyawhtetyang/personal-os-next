@@ -4,7 +4,7 @@ Personal OS Next is a capability-first, headless Personal Operating System.
 
 ## Core flow
 
-Human / Interface
+Human / AI / CLI
 → Context
 → Capability
 → Runtime
@@ -15,8 +15,8 @@ Human / Interface
 
 - vault/ — Human workspace, primarily Obsidian
 - system/ — Rules, contracts, policies and capability definitions
-- runtime/ — Execution implementations and workflows
-- data/ — State and artifacts
+- runtime/ — Execution implementations and canonical runtime behavior
+- data/ — State, artifacts and run records
 - ops/ — Maintenance
 - tests/ — Quality
 - docs/ — Architecture and documentation
@@ -26,4 +26,14 @@ Human / Interface
 
 Start deterministic and simple. Add workflows when repeated. Add dedicated orchestration only when real coordination problems justify it.
 
-Status: v0.1.0 foundation.
+## Canonical execution
+
+```bash
+python -m runtime execute media.save \
+  --input '{"url":"https://example.com/video"}' \
+  --options '{"mode":"audio"}'
+```
+
+Human-friendly capability commands remain available as convenience adapters.
+
+Status: v0.5.0 Access Layer.
