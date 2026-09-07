@@ -60,11 +60,10 @@ class ExecutionEngine:
 
         artifact = None
         artifact_path = raw["data"].get("artifact_path")
-        if artifact_path:
-            if not Path(artifact_path).is_file():
-                err = error("VerificationError", "Capability reported an artifact path that was not found.")
-                run = write_run(request.capability, "failed", error=err)
-                return failure(request.capability, err, run_id=run["run_id"], data={"run": run})
+        if artifact_path and not Path(artifact_path).is_file():
+            err = error("VerificationError", "Capability reported an artifact path that was not found.")
+            run = write_run(request.capability, "failed", error=err)
+            return failure(request.capability, err, run_id=run["run_id"], data={"run": run})
 
         try:
             run = write_run(request.capability, "success", artifact_path=str(artifact_path) if artifact_path else None)
