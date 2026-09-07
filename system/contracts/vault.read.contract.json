@@ -1,0 +1,6 @@
+{
+  "schema_version": "0.1",
+  "capability": "vault.read",
+  "input": {"type": "object", "required": ["path"], "properties": {"path": {"type": "string"}}},
+  "output": {"type": "object", "required": ["path", "content", "format"]}
+}
