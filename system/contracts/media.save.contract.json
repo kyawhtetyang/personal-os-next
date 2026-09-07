@@ -1,0 +1,21 @@
+{
+  "id": "media.save",
+  "version": "0.1.0",
+  "input": {
+    "url": "required:string",
+    "mode": "optional:audio|video",
+    "audio_format": "optional:original|m4a|mp3",
+    "video_format": "optional:original|mp4",
+    "output_dir": "optional:path",
+    "overwrite": "optional:boolean",
+    "browser": "optional:string",
+    "cookies": "optional:path"
+  },
+  "output": {
+    "status": "success|failed",
+    "artifact_path": "optional:path",
+    "format": "optional:string",
+    "source_url": "string",
+    "error": "optional:object"
+  }
+}
