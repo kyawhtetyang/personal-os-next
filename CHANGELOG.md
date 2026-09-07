@@ -2,6 +2,17 @@
 
 All notable changes to Personal OS Next are documented here.
 
+## [0.5.0] - 2026-09-08
+
+### Added
+- Canonical generic CLI execution through `python -m runtime execute <capability>`.
+- JSON object parsing for canonical `input` and optional `options`.
+- Access Layer documentation for human, AI, CLI, and future API clients.
+
+### Changed
+- Existing human-friendly commands remain convenience adapters over canonical runtime models.
+- README status and execution examples now reflect the current architecture.
+
 ## [0.4.0] - 2026-09-08
 
 ### Added
