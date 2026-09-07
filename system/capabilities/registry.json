@@ -1,0 +1,15 @@
+{
+  "schema_version": "0.1",
+  "capabilities": [
+    {
+      "id": "media.save",
+      "status": "active",
+      "version": "0.1.0",
+      "definition": "system/capabilities/media.save.md",
+      "contract": "system/contracts/media.save.contract.json",
+      "runtime": "runtime.capabilities.media_save",
+      "cli": "python -m runtime media save",
+      "description": "Save supported media from a URL as audio or video."
+    }
+  ]
+}
