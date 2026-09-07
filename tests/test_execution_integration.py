@@ -24,7 +24,7 @@ class ExecutionIntegrationTests(unittest.TestCase):
                     stderr = ""
                 return Result()
 
-            with patch("runtime.capabilities.media_save.shutil.which", return_value="/bin/tool"),                  patch("runtime.capabilities.media_save.subprocess.run", side_effect=fake_run):
+            with patch("runtime.capabilities.media_save.shutil.which", return_value="/bin/tool"),                  patch("subprocess.run", side_effect=fake_run):
                 with patch("runtime.core.artifact.DEFAULT_REGISTRY", root / "artifacts.json"),                      patch("runtime.core.state.DEFAULT_STATE", root / "state.json"):
                     result = save_media("https://example.com/video", output_dir=output)
 
