@@ -1,0 +1,17 @@
+{
+  "schema_version": "0.1",
+  "os": {
+    "id": "personal-os-next",
+    "name": "Personal OS Next"
+  },
+  "version_file": "VERSION",
+  "architecture": {
+    "document": "docs/architecture.md",
+    "layers": ["vault", "system", "runtime", "data", "ops", "tests", "archive"]
+  },
+  "capability_registry": "system/capabilities/registry.json",
+  "result_contract": "system/contracts/result.contract.json",
+  "entrypoints": {
+    "cli": "python -m runtime"
+  }
+}
