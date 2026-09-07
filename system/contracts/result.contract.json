@@ -1,0 +1,13 @@
+{
+  "id": "runtime.result",
+  "version": "0.1.0",
+  "required": ["status", "capability", "run_id", "artifacts", "data", "error"],
+  "properties": {
+    "status": "success|failed",
+    "capability": "string",
+    "run_id": "string|null",
+    "artifacts": "array",
+    "data": "object",
+    "error": "object|null"
+  }
+}
