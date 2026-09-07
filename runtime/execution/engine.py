@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from runtime.capabilities.media_save import save_media
+from runtime.capabilities.vault_access import read_vault, write_vault
 from runtime.core.artifact import register_artifact
 from runtime.core.registry import get_capability
 from runtime.core.result import failure, success, validate_result
@@ -19,9 +20,15 @@ class ExecutionEngine:
     def _resolve(self, capability):
         if get_capability(capability) is None:
             raise LookupError(f"Unknown capability: {capability}")
-        if capability == "media.save":
-            return save_media
-        raise LookupError(f"No runtime implementation for capability: {capability}")
+        handlers = {
+            "media.save": save_media,
+            "vault.read": read_vault,
+            "vault.write": write_vault,
+        }
+        try:
+            return handlers[capability]
+        except KeyError as exc:
+            raise LookupError(f"No runtime implementation for capability: {capability}") from exc
 
     def execute(self, request):
         try:
@@ -51,21 +58,33 @@ class ExecutionEngine:
             raw["data"]["run"] = run
             return raw
 
+        artifact = None
         artifact_path = raw["data"].get("artifact_path")
-        if not artifact_path or not Path(artifact_path).is_file():
-            err = error("VerificationError", "Capability succeeded but no verified artifact was found.")
-            run = write_run(request.capability, "failed", error=err)
-            return failure(request.capability, err, run_id=run["run_id"], data={"run": run})
+        if artifact_path:
+            if not Path(artifact_path).is_file():
+                err = error("VerificationError", "Capability reported an artifact path that was not found.")
+                run = write_run(request.capability, "failed", error=err)
+                return failure(request.capability, err, run_id=run["run_id"], data={"run": run})
 
         try:
-            run = write_run(request.capability, "success", artifact_path=str(artifact_path))
-            artifact = register_artifact(artifact_path, raw["data"].get("artifact_type", "artifact"), run_id=run["run_id"], source=raw["data"].get("source_url"))
-            state = update_state(request.capability, {
+            run = write_run(request.capability, "success", artifact_path=str(artifact_path) if artifact_path else None)
+            if artifact_path:
+                artifact = register_artifact(
+                    artifact_path,
+                    raw["data"].get("artifact_type", "artifact"),
+                    run_id=run["run_id"],
+                    source=raw["data"].get("source_url"),
+                )
+            state_updates = {
                 "status": "success",
                 "last_run_id": run["run_id"],
-                "last_artifact_id": artifact["artifact_id"],
-                "last_artifact_path": str(artifact_path),
-            })
+            }
+            if artifact:
+                state_updates.update({
+                    "last_artifact_id": artifact["artifact_id"],
+                    "last_artifact_path": str(artifact_path),
+                })
+            state = update_state(request.capability, state_updates)
         except Exception as exc:
             err = error("VerificationError", str(exc))
             return failure(request.capability, err, run_id=context.run_id)
@@ -73,7 +92,7 @@ class ExecutionEngine:
         result = success(
             request.capability,
             run_id=run["run_id"],
-            artifacts=[artifact],
+            artifacts=[artifact] if artifact else [],
             data={**raw["data"], "run": run, "state": state, "context": {"run_id": context.run_id, "timestamp": context.timestamp}},
         )
         return validate_result(result)
