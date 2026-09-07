@@ -3,11 +3,12 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 from runtime.core.run_record import write_run
+from runtime.core.result import failure, success
 
 def _fail(kind, message, hint, source_url):
     error={"kind":kind,"message":message,"hint":hint}
     run=write_run("media.save","failed",source_url=source_url,error=error)
-    return {"status":"failed","capability":"media.save","source_url":source_url,"error":error,"run":run}
+    return failure("media.save", error, run_id=run["run_id"], data={"source_url":source_url,"run":run})
 
 def save_media(url, mode="audio", audio_format="mp3", video_format="mp4", output_dir="data/artifacts/media", overwrite=False, browser=None, cookies=None):
     if mode not in {"audio","video"}:
@@ -37,4 +38,4 @@ def save_media(url, mode="audio", audio_format="mp3", video_format="mp4", output
         return _fail("VerificationError","Command completed but no expected artifact was found.","Inspect yt-dlp output and output directory.",url)
     artifact=created[-1]
     run=write_run("media.save","success",source_url=url,artifact_path=str(artifact))
-    return {"status":"success","capability":"media.save","source_url":url,"artifact_path":str(artifact),"format":artifact.suffix.lstrip("."),"run":run}
+    return success("media.save", run_id=run["run_id"], artifacts=[str(artifact)], data={"source_url":url,"format":artifact.suffix.lstrip("."),"run":run})
