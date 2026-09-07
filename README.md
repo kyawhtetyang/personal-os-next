@@ -34,6 +34,6 @@ python -m runtime execute media.save \
   --options '{"mode":"audio"}'
 ```
 
-Human-friendly capability commands remain available as convenience adapters.
+Vault access is Markdown-first through canonical vault.read and vault.write capabilities.\n\nHuman-friendly capability commands remain available as convenience adapters.
 
-Status: v0.5.0 Access Layer.
+Status: v0.6.0 Vault Access Foundation.
