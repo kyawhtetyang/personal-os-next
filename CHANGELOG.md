@@ -30,3 +30,24 @@ All notable changes to Personal OS Next are documented here.
 - Run record creation
 
 [0.1.0]: https://github.com/kyawhtetyang/personal-os-next/releases/tag/v0.1.0
+
+## [0.2.0] - 2026-09-07
+
+### Added
+- Persistent runtime state model.
+- Artifact registry for generated artifacts.
+- Canonical execution result model.
+- Capability registry and runtime capability discovery.
+- System discovery manifest and `python -m runtime discover`.
+- Execution lifecycle integration between runs, artifacts, and state.
+- Integration and end-to-end validation coverage.
+
+### Fixed
+- Runtime-generated state files are ignored by Git.
+- Media artifact verification accepts artifacts reported by successful execution.
+
+### Validation
+- 29 automated tests passing.
+- Quality checks passing.
+- Health checks passing.
+- Real end-to-end `media.save` execution validated.
