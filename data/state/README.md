@@ -1,5 +1,17 @@
-# State
+# Runtime State
 
-Current machine-readable state.
+Runtime state stores current system truth.
 
-State answers: What is currently true?
+Examples:
+
+- last successful execution
+- current status
+- latest artifact reference
+
+Canonical generated file:
+
+```text
+data/state/runtime.json
+```
+
+Do not treat state as history. Historical execution belongs in `data/runs/`.
