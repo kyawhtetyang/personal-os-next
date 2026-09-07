@@ -1,37 +1,31 @@
-# Personal OS Next Architecture v0.1.0
+# Personal OS Next Architecture
 
-## Core structure
+Personal OS Next is a headless system with clear boundaries.
 
-vault → Human Interface
-system → Governance
-runtime → Execution
-data → State and Artifacts
+HUMAN / CLI / API / AI
+        |
+        v
+     Context Layer
+        |
+        v
+System Discovery / State / Artifacts / Capabilities
+        |
+        v
+     Runtime
+        |
+        v
+      Data
 
-Supporting layers:
-ops → Maintenance
-tests → Quality
-docs → Documentation
-archive → History
+## Layers
 
-## Core behavior
+- vault/ is the human workspace.
+- system/ contains rules, contracts, capabilities, and discovery metadata.
+- runtime/ contains executable system behavior.
+- data/ contains persistent state, artifacts, and run records.
+- context/ selects and projects relevant information for consumers without depending on an AI provider.
 
-REQUEST
-↓
-CONTEXT
-↓
-CAPABILITY
-↓
-EXECUTE
-↓
-VERIFY
-↓
-DATA
+## v0.3 Context Flow
 
-## Evolution
+Consumer -> ContextRequest -> ContextAssembler -> Sources -> Canonical Context -> Projection
 
-v0.1.0 Foundation
-→ v0.2.0 Capability growth
-→ v0.3.0 Deterministic workflows
-→ v0.4.0 Context retrieval
-→ later: routing only if necessary
-→ later: planning/agent orchestration only if justified
+Context is not a knowledge store, prompt, or model adapter.
