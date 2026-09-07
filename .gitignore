@@ -13,3 +13,6 @@ data/artifacts/*
 # Runtime-generated execution records
 data/runs/*
 !data/runs/README.md
+
+# Runtime-generated state
+data/state/runtime.json
