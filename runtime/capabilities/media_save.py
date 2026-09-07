@@ -21,7 +21,7 @@ def save_media(url, mode="audio", audio_format="mp3", video_format="mp4", output
         return _fail("PrerequisiteError","ffmpeg is required for MP3 conversion but was not found.","Install ffmpeg and ensure it is on PATH.",url)
     destination=Path(output_dir); destination.mkdir(parents=True,exist_ok=True)
     before={p.resolve() for p in destination.glob("*") if p.is_file()}
-    command=["yt-dlp","--no-playlist","-o",str(destination/"%(title)s.%(ext)s"),"--force-overwrites" if overwrite else "--no-overwrites"]
+    command=["yt-dlp","--no-playlist","-o",str(destination/"%(title)s.%(ext)s"),"--print","after_move:filepath","--force-overwrites" if overwrite else "--no-overwrites"]
     if browser: command += ["--cookies-from-browser",browser]
     elif cookies: command += ["--cookies",cookies]
     if mode=="audio":
@@ -34,11 +34,18 @@ def save_media(url, mode="audio", audio_format="mp3", video_format="mp4", output
     if result.returncode!=0:
         return _fail("MediaError",result.stderr.strip() or result.stdout.strip() or "Media download failed.","Check network, source access, cookies/browser authentication and prerequisites.",url)
     created=sorted({p.resolve() for p in destination.glob("*") if p.is_file()}-before,key=lambda p:p.stat().st_mtime)
-    if not created and overwrite: created=sorted(destination.glob("*"),key=lambda p:p.stat().st_mtime)
-    if mode=="audio" and audio_format!="original": created=[p for p in created if p.suffix.lower()==f".{audio_format}"]
-    if not created:
+    reported=[]
+    for line in result.stdout.splitlines():
+        candidate=Path(line.strip()).expanduser()
+        if candidate.is_file():
+            reported.append(candidate.resolve())
+    if mode=="audio" and audio_format!="original":
+        created=[p for p in created if p.suffix.lower()==f".{audio_format}"]
+        reported=[p for p in reported if p.suffix.lower()==f".{audio_format}"]
+    candidates=created or reported
+    if not candidates:
         return _fail("VerificationError","Command completed but no expected artifact was found.","Inspect yt-dlp output and output directory.",url)
-    artifact=created[-1]
+    artifact=candidates[-1]
     run=write_run("media.save","success",source_url=url,artifact_path=str(artifact))
     artifact_record=register_artifact(
         artifact,
