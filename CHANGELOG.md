@@ -2,6 +2,18 @@
 
 All notable changes to Personal OS Next are documented here.
 
+## [0.6.0] - 2026-09-08
+
+### Added
+- Canonical Markdown-first vault.read and vault.write capabilities.
+- Safe vault path resolution that rejects absolute paths and vault escape attempts.
+- Deterministic write verification and overwrite protection.
+- ExecutionEngine support for successful non-artifact capabilities.
+- Focused vault access tests.
+
+### Changed
+- Successful capabilities may now return canonical results without requiring an artifact.
+
 ## [0.5.0] - 2026-09-08
 
 ### Added
