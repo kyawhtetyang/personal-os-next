@@ -40,5 +40,20 @@ class ExecutionEngineTests(unittest.TestCase):
             self.assertEqual(len(result["artifacts"]), 1)
 
 
+    def test_non_artifact_success_lifecycle(self):
+        raw = {
+            "status": "success",
+            "capability": "vault.read",
+            "run_id": None,
+            "artifacts": [],
+            "data": {"path": "journal/today.md", "content": "# Today", "format": "markdown"},
+            "error": None,
+        }
+        with patch("runtime.execution.engine.get_capability", return_value={"id": "vault.read"}), patch("runtime.execution.engine.read_vault", return_value=raw):
+            result = ExecutionEngine().execute({"capability": "vault.read", "input": {"path": "journal/today.md"}})
+        self.assertEqual(result["status"], "success")
+        self.assertEqual(result["artifacts"], [])
+        self.assertTrue(result["run_id"])
+
 if __name__ == "__main__":
     unittest.main()
