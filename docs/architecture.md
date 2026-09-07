@@ -1,20 +1,28 @@
 # Personal OS Next Architecture
 
-Personal OS Next is a headless system with clear boundaries.
+Personal OS Next is a headless, capability-first system with clear boundaries.
 
-HUMAN / CLI / API / AI
-        |
-        v
-     Context Layer
-        |
-        v
-System Discovery / State / Artifacts / Capabilities
-        |
-        v
-     Runtime
-        |
-        v
-      Data
+```text
+HUMAN / AI / CLI / FUTURE API
+             |
+             v
+        Access Layer
+             |
+             v
+       Context Layer
+             |
+             v
+Capabilities / Discovery / State / Artifacts
+             |
+             v
+      Execution Engine
+             |
+             v
+          Runtime
+             |
+             v
+           Data
+```
 
 ## Layers
 
@@ -22,10 +30,52 @@ System Discovery / State / Artifacts / Capabilities
 - system/ contains rules, contracts, capabilities, and discovery metadata.
 - runtime/ contains executable system behavior.
 - data/ contains persistent state, artifacts, and run records.
-- context/ selects and projects relevant information for consumers without depending on an AI provider.
+- context/ selects and projects relevant information without depending on an AI provider.
 
-## v0.3 Context Flow
+## Canonical execution
 
-Consumer -> ContextRequest -> ContextAssembler -> Sources -> Canonical Context -> Projection
+```text
+Client
+  ↓
+ExecutionRequest
+  ↓
+ExecutionEngine
+  ↓
+Capability
+  ↓
+Verification
+  ↓
+Run + Artifact + State
+  ↓
+Canonical Result
+```
+
+## Access Layer
+
+The generic CLI command is the canonical execution access path:
+
+```bash
+python -m runtime execute <capability> --input '<json>' --options '<json>'
+```
+
+Specialized commands such as `media save` remain convenience adapters. They translate user-friendly arguments into canonical request models and use the same ExecutionEngine lifecycle.
+
+The Access Layer does not introduce a new router, planner, orchestrator, or execution model.
+
+## Context
+
+```text
+Consumer
+  ↓
+ContextRequest
+  ↓
+ContextAssembler
+  ↓
+Sources
+  ↓
+Canonical Context
+  ↓
+Projection
+```
 
 Context is not a knowledge store, prompt, or model adapter.
