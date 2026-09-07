@@ -5,12 +5,15 @@ import json
 
 from runtime.capabilities.media_save import save_media
 from runtime.core.registry import get_capability, list_capabilities
+from runtime.core.discovery import discover
 from runtime.health import check
 
 
 def build_parser():
     parser = argparse.ArgumentParser(prog="python -m runtime")
     domains = parser.add_subparsers(dest="domain", required=True)
+
+    domains.add_parser("discover")
 
     capabilities = domains.add_parser("capabilities")
     capability_commands = capabilities.add_subparsers(dest="command", required=True)
@@ -39,7 +42,9 @@ def main():
     parser = build_parser()
     args = parser.parse_args()
 
-    if args.domain == "capabilities" and args.command == "list":
+    if args.domain == "discover":
+        result = discover()
+    elif args.domain == "capabilities" and args.command == "list":
         result = {"status": "success", "capabilities": list_capabilities()}
     elif args.domain == "capabilities" and args.command == "show":
         capability = get_capability(args.capability_id)
