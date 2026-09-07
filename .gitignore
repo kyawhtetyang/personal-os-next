@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Runtime-generated artifacts
+data/artifacts/*
+!data/artifacts/README.md
+
+# Runtime-generated execution records
+data/runs/*
+!data/runs/README.md
