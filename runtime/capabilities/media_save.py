@@ -1,6 +1,7 @@
 """Runtime implementation for capability: media.save."""
 from __future__ import annotations
 import shutil
+import subprocess
 from pathlib import Path
 from runtime.core.run_record import write_run
 from runtime.core.result import failure, success
@@ -29,7 +30,6 @@ def save_media(url, mode="audio", audio_format="mp3", video_format="mp4", output
         if audio_format!="original": command += ["--audio-format",audio_format]
     elif video_format=="mp4": command += ["--merge-output-format","mp4"]
     command.append(url)
-    import subprocess
     result=subprocess.run(command,text=True,capture_output=True,check=False)
     if result.returncode!=0:
         return _fail("MediaError",result.stderr.strip() or result.stdout.strip() or "Media download failed.","Check network, source access, cookies/browser authentication and prerequisites.",url)
