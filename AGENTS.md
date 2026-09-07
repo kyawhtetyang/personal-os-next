@@ -19,7 +19,7 @@ Help operate and evolve Personal OS Next without inventing parallel architecture
 - data = machine state and artifacts.
 - Do not place runtime code in vault.
 - Do not place canonical contracts inside generated artifacts.
-- Prefer existing capabilities over new scripts.
+- Prefer existing capabilities over new scripts.\n- For vault work, use vault.read and vault.write rather than direct ad-hoc file handling.\n- Keep vault paths relative to vault/ and preserve the human workspace boundary.
 - Prefer deterministic workflows over agentic behavior.
 - Add complexity only after repeated real use demonstrates need.
 
